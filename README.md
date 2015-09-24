@@ -1,4 +1,4 @@
-# bundle-vinylify
+# factor-vinylify
 Provide a `bundle` function to create a vinyl stream flowing browserify outputs.
 
 Based on [factor-bundle](https://www.npmjs.com/package/factor-bundle),
