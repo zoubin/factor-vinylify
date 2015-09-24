@@ -1,0 +1,48 @@
+{
+  "name": "factor-vinylify",
+  "version": "0.0.1",
+  "description": "Provide a `bundle` function to create a vinyl stream flowing browserify outputs",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "arr-diff": "^1.1.0",
+    "factor-bundle": "^2.5.0",
+    "merge-stream": "^1.0.0",
+    "through2": "^2.0.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "devDependencies": {
+    "browserify": "^11.1.0",
+    "callback-sequence": "^1.2.0",
+    "del": "^2.0.2",
+    "eslint": "^1.5.1",
+    "gulp": "^3.9.0",
+    "gulp-uglify": "^1.4.1",
+    "gulp-util": "^3.0.6",
+    "tap": "^1.4.1",
+    "util-equal": "^1.0.0"
+  },
+  "scripts": {
+    "test": "eslint lib/*.js test/*.js && tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoubin/factor-vinylify.git"
+  },
+  "keywords": [
+    "browserify-plugin",
+    "factor-bundle",
+    "gulp",
+    "browserify",
+    "vinyl"
+  ],
+  "author": "zoubin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zoubin/factor-vinylify/issues"
+  },
+  "homepage": "https://github.com/zoubin/factor-vinylify#readme"
+}
