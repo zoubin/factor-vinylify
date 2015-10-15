@@ -7,6 +7,8 @@ and makes `b.bundle` output a [vinyl](https://www.npmjs.com/package/vinyl) strea
 which flows all output file objects
 and can be transformed by [gulp](https://www.npmjs.com/package/gulp) plugins.
 
+To use [watchify](https://www.npmjs.com/package/watchify) with factor-bundle, try [reduce-js](https://github.com/zoubin/reduce-js).
+
 ## TOC
 
 - [example](#example)
