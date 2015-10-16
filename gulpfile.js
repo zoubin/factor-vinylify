@@ -39,7 +39,7 @@ gulp.task('upload-coverage', ['coverage'], function (cb) {
 gulp.task('coverage', require('callback-sequence')(
   instrument, test, report
 ))
-gulp.task('default', ['lint', 'upload-coverage'])
+gulp.task('default', ['lint', 'coverage'])
 
 function instrument() {
   var istanbul = require('gulp-istanbul')
