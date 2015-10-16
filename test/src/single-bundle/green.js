@@ -1,4 +1,4 @@
-var colorMap = require('colors');
+var colorMap = require('colors')
 
-module.exports = colorMap.green;
+module.exports = colorMap.green
 

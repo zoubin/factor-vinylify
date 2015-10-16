@@ -1,47 +1,51 @@
-var factor = require('..');
-var browserify = require('browserify');
-var test = require('tap').test;
-var runSequence = require('callback-sequence').run;
-var path = require('path');
-var del = require('del');
-var gutil = require('gulp-util');
-var uglify = require('gulp-uglify');
-var gulp = require('gulp');
-var equal = require('util-equal');
+var test = require('tape')
+var runSequence = require('callback-sequence').run
+var path = require('path')
+var del = require('del')
 
-var fixtures = path.resolve.bind(path, __dirname);
-var log = gutil.log.bind(gutil);
-var dest = fixtures.bind(null, 'build', 'single-bundle');
-var expect = fixtures.bind(null, 'expected', 'single-bundle');
+var fixtures = path.resolve.bind(path, __dirname)
 
-test('single bundle', function(t) {
-  t.plan(1);
-  runSequence(
-    [clean, bundle],
-    function () {
-      equal(
-        dest('common.js'),
-        expect('common.js'),
-        function (res) {
-          t.ok(res);
-        }
-      );
-    }
-  );
-});
+var compare = require('./util/compare-directory')
+var bundle = require('./util/bundle')
+
+var dir = 'single-bundle'
+var dest = fixtures('build', dir)
+var expect = fixtures('expected', dir)
+var src = fixtures('src', dir)
 
 function clean() {
-  return del(dest());
+  return del(dest)
+}
+function bundleTask(fopts) {
+  return bundle(
+    ['green.js', 'red.js'], { basedir: src },
+    dest, fopts
+  )
 }
 
-function bundle() {
-  var opts = { basedir: fixtures('src', 'single-bundle') };
-  return browserify(['green.js', 'red.js'], opts)
-    .plugin(factor)
-    .bundle()
-    .on('log', log)
-    .on('error', log)
-    .pipe(uglify())
-    .pipe(gulp.dest(dest()));
-}
+test('single-bundle', function(t, cb) {
+  function bundleCmp(msg) {
+    compare(dest, expect, t, function (m) {
+      return msg + ':\t' + m
+    }, function (f) {
+      if (f === 'bundle.js') {
+        return 'common.js'
+      }
+      return f
+    })
+  }
+  runSequence([
+    clean,
+    bundleTask.bind(null, null),
+    bundleCmp.bind(null, 'default options'),
+
+    clean,
+    bundleTask.bind(null, 'bundle.js'),
+    bundleCmp.bind(null, 'string options'),
+
+    clean,
+    bundleTask.bind(null, { common: 'bundle.js' }),
+    bundleCmp.bind(null, 'opts.common'),
+  ], cb)
+})
 

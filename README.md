@@ -1,6 +1,15 @@
 # factor-vinylify
 Provide a `bundle` function to create a vinyl stream flowing browserify outputs.
 
+[![npm](https://nodei.co/npm/factor-vinylify.png?downloads=true)](https://www.npmjs.org/package/factor-vinylify)
+
+[![version](https://img.shields.io/npm/v/factor-vinylify.svg)](https://www.npmjs.org/package/factor-vinylify)
+[![status](https://travis-ci.org/zoubin/factor-vinylify.svg?branch=master)](https://travis-ci.org/zoubin/factor-vinylify)
+[![coverage](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/zoubin/factor-vinylify)
+[![dependencies](https://david-dm.org/zoubin/factor-vinylify.svg)](https://david-dm.org/zoubin/factor-vinylify)
+[![devDependencies](https://david-dm.org/zoubin/factor-vinylify/dev-status.svg)](https://david-dm.org/zoubin/factor-vinylify#info=devDependencies)
+
+
 Based on [factor-bundle](https://www.npmjs.com/package/factor-bundle),
 this plugin provides some sugar ways to configure factor-bundle,
 and makes `b.bundle` output a [vinyl](https://www.npmjs.com/package/vinyl) stream,
@@ -24,28 +33,28 @@ To use [watchify](https://www.npmjs.com/package/watchify) with factor-bundle, tr
 See the files in the `example` directory.
 
 ```javascript
-var vinylify = require('..');
-var browserify = require('browserify');
+var vinylify = require('..')
+var browserify = require('browserify')
 
-var path = require('path');
-var del = require('del');
-var gutil = require('gulp-util');
-var uglify = require('gulp-uglify');
-var gulp = require('gulp');
+var path = require('path')
+var del = require('del')
+var gutil = require('gulp-util')
+var uglify = require('gulp-uglify')
+var gulp = require('gulp')
 
-var fixtures = path.resolve.bind(path, __dirname);
-var log = gutil.log.bind(gutil);
-var DEST = fixtures('build');
+var fixtures = path.resolve.bind(path, __dirname)
+var log = gutil.log.bind(gutil)
+var DEST = fixtures('build')
 
 gulp.task('clean', function () {
-  return del(DEST);
-});
+  return del(DEST)
+})
 
 gulp.task('default', ['clean'], function () {
   var opts = {
     entries: ['blue.js', 'green.js', 'red.js'],
     basedir: fixtures('src'),
-  };
+  }
   return browserify(opts)
     .plugin(vinylify, {
       entries: ['green.js', 'red.js'],
@@ -56,8 +65,8 @@ gulp.task('default', ['clean'], function () {
     .on('log', log)
     .on('error', log)
     .pipe(uglify())
-    .pipe(gulp.dest(DEST));
-});
+    .pipe(gulp.dest(DEST))
+})
 
 ```
 
@@ -157,15 +166,15 @@ gulp.task('single-bundle', ['clean'], function () {
   var opts = {
     entries: ['blue.js', 'green.js', 'red.js'],
     basedir: fixtures('src'),
-  };
+  }
   return browserify(opts)
     .plugin(vinylify, { common: 'common.js' })
     .bundle()
     .on('log', log)
     .on('error', log)
     .pipe(uglify())
-    .pipe(gulp.dest(DEST));
-});
+    .pipe(gulp.dest(DEST))
+})
 
 ```
 
@@ -185,7 +194,7 @@ gulp.task('bundle-for-each-browserify-entry', ['clean'], function () {
   var opts = {
     entries: ['blue.js', 'green.js', 'red.js'],
     basedir: fixtures('src'),
-  };
+  }
   return browserify(opts)
     .plugin(vinylify, {
       needFactor: true,
@@ -195,8 +204,8 @@ gulp.task('bundle-for-each-browserify-entry', ['clean'], function () {
     .on('log', log)
     .on('error', log)
     .pipe(uglify())
-    .pipe(gulp.dest(DEST));
-});
+    .pipe(gulp.dest(DEST))
+})
 
 ```
 
@@ -209,7 +218,7 @@ gulp.task('bundle-for-each-browserify-entry-with-no-common', ['clean'], function
   var opts = {
     entries: ['blue.js', 'green.js', 'red.js'],
     basedir: fixtures('src'),
-  };
+  }
   return browserify(opts)
     .plugin(vinylify, {
       needFactor: true,
@@ -218,8 +227,8 @@ gulp.task('bundle-for-each-browserify-entry-with-no-common', ['clean'], function
     .on('log', log)
     .on('error', log)
     .pipe(uglify())
-    .pipe(gulp.dest(DEST));
-});
+    .pipe(gulp.dest(DEST))
+})
 
 ```
 
