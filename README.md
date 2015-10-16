@@ -5,7 +5,7 @@ Provide a `bundle` function to create a vinyl stream flowing browserify outputs.
 
 [![version](https://img.shields.io/npm/v/factor-vinylify.svg)](https://www.npmjs.org/package/factor-vinylify)
 [![status](https://travis-ci.org/zoubin/factor-vinylify.svg?branch=master)](https://travis-ci.org/zoubin/factor-vinylify)
-[![coverage](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/zoubin/factor-vinylify)
+[![coverage](https://img.shields.io/coveralls/zoubin/factor-vinylify.svg)](https://coveralls.io/github/zoubin/factor-vinylify)
 [![dependencies](https://david-dm.org/zoubin/factor-vinylify.svg)](https://david-dm.org/zoubin/factor-vinylify)
 [![devDependencies](https://david-dm.org/zoubin/factor-vinylify/dev-status.svg)](https://david-dm.org/zoubin/factor-vinylify#info=devDependencies)
 
