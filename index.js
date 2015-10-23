@@ -1,3 +1,4 @@
+var source = require('vinyl-source-stream')
 
 module.exports = function (b, opts) {
   opts = opts || {}
@@ -5,6 +6,7 @@ module.exports = function (b, opts) {
     opts = { common: opts }
   }
   var needFactor = opts.entries || opts.outputs || opts.needFactor
+  opts.toVinylStream = opts.toVinylStream || source
   var common = opts.common
   if (needFactor) {
     if (!common) {
@@ -18,6 +20,7 @@ module.exports = function (b, opts) {
   b.plugin(require('./lib/bundle'), {
     common: common,
     needFactor: needFactor,
+    toVinylStream: opts.toVinylStream,
     basedir: opts.basedir || b._options.basedir,
   })
 
