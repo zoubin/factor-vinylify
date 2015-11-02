@@ -18,16 +18,6 @@ to be transformed by [gulp](https://www.npmjs.com/package/gulp) plugins.
 
 To use [watchify](https://www.npmjs.com/package/watchify) with factor-bundle, try [reduce-js](https://github.com/zoubin/reduce-js).
 
-## TOC
-
-- [example](#example)
-- [options](#options)
-- [details](#details)
-  - [single bundle](#single-bundle)
-  - [multiple bundles](#multiple-bundles)
-  - [entry problems](#entry-problems)
-  - [dedupe problems](#dedupe-problems)
-
 ## example
 
 See the files in the `example` directory.
