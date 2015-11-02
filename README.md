@@ -14,7 +14,7 @@ Based on [factor-bundle](https://www.npmjs.com/package/factor-bundle),
 this plugin provides some sugar ways to configure factor-bundle,
 and makes `b.bundle` output a [vinyl](https://www.npmjs.com/package/vinyl) stream,
 which flows all output file objects
-and can be transformed by [gulp](https://www.npmjs.com/package/gulp) plugins.
+to be transformed by [gulp](https://www.npmjs.com/package/gulp) plugins.
 
 To use [watchify](https://www.npmjs.com/package/watchify) with factor-bundle, try [reduce-js](https://github.com/zoubin/reduce-js).
 
@@ -50,20 +50,43 @@ gulp.task('clean', function () {
   return del(DEST)
 })
 
-gulp.task('default', ['clean'], function () {
+gulp.task('outputs', ['clean'], function () {
   var opts = {
     entries: ['blue.js', 'green.js', 'red.js'],
     basedir: fixtures('src'),
   }
   return browserify(opts)
     .plugin(vinylify, {
-      entries: ['green.js', 'red.js'],
-      outputs: ['green.js', 'red.js'],
-      common: 'common.js',
+      outputs: ['page/blue.js', 'page/green.js', 'page/red.js'],
+      common: 'common.js'
     })
-    .bundle()
     .on('log', log)
     .on('error', log)
+    .bundle()
+    .pipe(uglify())
+    .pipe(gulp.dest(DEST))
+})
+
+gulp.task('rename', ['clean'], function () {
+  var opts = {
+    entries: ['blue.js', 'green.js', 'red.js'],
+    basedir: fixtures('src'),
+  }
+  return browserify(opts)
+    .plugin(vinylify, {
+      needFactor: true,
+      common: 'common.js'
+    })
+    .on('log', log)
+    .on('error', log)
+    .bundle()
+    .pipe(rename(function (p) {
+      if (p.basename === 'common') {
+        return p
+      }
+      p.dirname += '/page'
+      return p
+    }))
     .pipe(uglify())
     .pipe(gulp.dest(DEST))
 })
@@ -73,17 +96,16 @@ gulp.task('default', ['clean'], function () {
 ## options
 
 ### entries
+Specify the factor entries.
 
 Type: `Function`, `Array`
-
-The factor entries.
 
 If `Function`, it receives all the browserify entries (`b._options.entries`),
 and should return an array of factor entries.
 
 If not specified, all browserify entries will be used as factor entries.
 
-Browserify will detect a dependency graph from the browserify entries.
+Browserify will detect a dependency graph from the inputed browserify entries.
 And factor-bundle will put them into several groups according to the factor entries,
 which are packed into bundles later.
 
@@ -100,8 +122,13 @@ be careful to choose the factor entries.
 
 Each element can be either an absolte path or one relative to `b._options.basedir` (not necessarily `options.basedir`).
 
+**NOTE**: browserify entries metioned here are only those directly passed to the browserify constructor,
+not including those added by `b.add`.
+
 
 ### outputs
+Specify the output file paths.
+You can also use [gulp-rename](https://github.com/hparra/gulp-rename) to do this job instead.
 
 Type: `Function`, `Array`
 
@@ -128,14 +155,21 @@ Passed to [vinyl-source-stream](https://www.npmjs.com/package/vinyl-source-strea
 If not specified, `b._options.basedir` will be used.
 
 ### threshold
+Specify which files go to the common bundle.
+
+Type: `Array`
+
+Passed to [multimatch](https://github.com/sindresorhus/multimatch),
+and matched files are put into the common bundle.
+
+Type: `RegExp`
+
+Any matched files are put into the common bundle.
 
 Type: `Number`, `Function`
 
 It serves the same purpose with [factor-bundle#threshold](https://github.com/substack/factor-bundle/#var-fr--factorfiles-opts),
 and they share the same signature.
-
-However, its effect is restricted by some rules,
-which are described [later](#details).
 
 ### common
 
@@ -143,75 +177,21 @@ Type: `String`
 
 The file path for the common bundle.
 
-### commonFilter
+### needFactor
 
-Type: `Array`
+Type: `Boolean`
 
-File paths for modules which are intended for the common bundle.
+Default: `false`
 
-You can specify some non-entry modules (like jQuery) to be packed into the common bundle always.
+To enable the factor-bundle plugin,
+specify one of `entries`, `outputs`, and `needFactor`
+as truthy.
 
-Remeber that the paths are resolved against `b._options.basedir`,
-and probably you would have to pass them absolute.
+Usually,
+if you want to use the default entries and outputs options,
+you probably need to specify `needFactor` as `true`.
 
-## details
-
-### single bundle
-
-If none of `options.entries`, `options.outputs` and `options.needFactor` is truthy,
-only the common bundle will be created:
-
-```javascript
-gulp.task('single-bundle', ['clean'], function () {
-  var opts = {
-    entries: ['blue.js', 'green.js', 'red.js'],
-    basedir: fixtures('src'),
-  }
-  return browserify(opts)
-    .plugin(vinylify, { common: 'common.js' })
-    .bundle()
-    .on('log', log)
-    .on('error', log)
-    .pipe(uglify())
-    .pipe(gulp.dest(DEST))
-})
-
-```
-
-### multiple bundles
-
-`factor-bundle` will be used when `options.entries`,
-or `options.outputs`, or `options.needFactor` is truthy.
-
-#### bundle for each browserify entry
-
-To create a bundle for each browserify entry,
-specify `options.needFactor` as true,
-and do not specify `options.entries`:
-
-```javascript
-gulp.task('bundle-for-each-browserify-entry', ['clean'], function () {
-  var opts = {
-    entries: ['blue.js', 'green.js', 'red.js'],
-    basedir: fixtures('src'),
-  }
-  return browserify(opts)
-    .plugin(vinylify, {
-      needFactor: true,
-      common: 'common.js',
-    })
-    .bundle()
-    .on('log', log)
-    .on('error', log)
-    .pipe(uglify())
-    .pipe(gulp.dest(DEST))
-})
-
-```
-
-#### suppress the common bundle
-
-Specify only `options.needFactor`.
+Also, if you want to suppress the common bundle:
 
 ```javascript
 gulp.task('bundle-for-each-browserify-entry-with-no-common', ['clean'], function () {
@@ -223,53 +203,39 @@ gulp.task('bundle-for-each-browserify-entry-with-no-common', ['clean'], function
     .plugin(vinylify, {
       needFactor: true,
     })
-    .bundle()
     .on('log', log)
     .on('error', log)
+    .bundle()
     .pipe(uglify())
     .pipe(gulp.dest(DEST))
 })
 
 ```
 
-### entry problems
+### commonify
 
-Browserify entries are distinguished from normal modules,
-due to their immediate execution when loaded.
+Type: `Boolean`
 
-So, you should use them in a more careful way.
+Default: `true`
 
-#### never require an entry
+If `true`,
 
-Browserify entries should never be required by other modules,
-because the executing order of entries in a bundle
-is determined by their order of being added into browserify.
+* entries are excluded from the common bundle
+* dedupes that are not entries go to the common bundle
 
-#### entries in common
-
-If we never require browserify entries,
-and want some of them packed into the common bundle,
-the best way is to filter them out of the factor entries.
-
-### dedupe problems
-The way browserify handles modules
-whose contents are exactly the same
-has some subtle problems
-(See [factor-bundle#51](https://github.com/substack/factor-bundle/issues/51)).
-
-To make bundles work properly,
-rules are established to control the dedupe behavior.
-
-#### deduped modules always go to common
 As stated in [#51](https://github.com/substack/factor-bundle/issues/51),
 if a deduped module is not packed into the same bundle with the module it is deduped against,
 the deduped module won't work.
+So we put all dedupe into the common bundle to avoid that problem.
 
-So, all deduped modules, together with the module they are deduped against will be packed into the common bundle.
+If you do want entries go to the common bundle,
+specify a proper [threshold](#threshold) option.
 
-#### entries never deduped
+### dedupify
 
-Most entries will be excluded from the common bundle,
-so they will also be kept from being deduped.
+Type: `Boolean`
 
+Default: `true`
+
+If `true`, entries will never be deduped.
 

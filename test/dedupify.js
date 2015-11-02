@@ -2,51 +2,40 @@ var test = require('tape')
 var runSequence = require('callback-sequence').run
 var path = require('path')
 var del = require('del')
-
-var fixtures = path.resolve.bind(path, __dirname)
-
+var fixtures = path.resolve.bind(path, __dirname, 'fixtures')
 var compare = require('./util/compare-directory')
 var bundle = require('./util/bundle')
+var dest = fixtures('build')
+var src = fixtures('src', 'dedupify')
+var expected = fixtures('expected', 'dedupify')
+var fs = require('fs')
 
-var src = fixtures('src', 'dedupe')
+function clean() {
+  return del(dest)
+}
 
 test('dedupify', function(t, cb) {
-  var dir = 'dedupe'
-  var dest = fixtures('build', dir)
-  var expect = fixtures('expected', dir)
-  var mode = dir
-
-  function cmp() {
-    ncmp()
-  }
-  function ncmp(normalize) {
-    compare(dest, expect, t, function (m) {
-      return mode + ':\t' + m
-    }, normalize)
-  }
-
-  function clean() {
-    return del(dest)
-  }
-
-  function pack(fopts) {
-    return bundle(
-      ['blue.js', 'blue.copy.js', 'green.js', 'green-red.js', 'red.js'],
-      { basedir: src },
-      dest,
-      fopts
-    )
-  }
-
   runSequence([
-
     clean,
-    pack.bind(null, {
-      needFactor: true,
-      common: 'common.js',
-    }),
-    cmp,
-
+    function () {
+      return bundle(
+        ['blue.js', 'blue.copy.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          needFactor: true,
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      t.equal(
+        fs.readFileSync(path.join(src, 'blue.js'), 'utf8'),
+        fs.readFileSync(path.join(src, 'blue.copy.js'), 'utf8'),
+        'should contain the same contents'
+      )
+      compare(dest, expected, t)
+    },
   ], cb)
 })
 

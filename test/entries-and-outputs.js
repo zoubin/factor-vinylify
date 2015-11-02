@@ -2,100 +2,246 @@ var test = require('tape')
 var runSequence = require('callback-sequence').run
 var path = require('path')
 var del = require('del')
-
-var fixtures = path.resolve.bind(path, __dirname)
-
+var fixtures = path.resolve.bind(path, __dirname, 'fixtures')
 var compare = require('./util/compare-directory')
 var bundle = require('./util/bundle')
-
+var dest = fixtures('build')
 var src = fixtures('src', 'multiple-bundles')
 
-test('entries and outputs', function(t, cb) {
-  var dir = 'default-factor-entries'
-  var dest = fixtures('build', dir)
-  var expect = fixtures('expected', dir)
+function clean() {
+  return del(dest)
+}
 
-  function cmp() {
-    ncmp()
-  }
-  function ncmp(normalize) {
-    compare(dest, expect, t, function (m) {
-      return dir + ':\t' + m
-    }, normalize)
-  }
-
-  function clean() {
-    return del(dest)
-  }
-
-  function reset(d) {
-    dir = d
-    dest = fixtures('build', dir)
-    expect = fixtures('expected', dir)
-  }
-
-  function pack(fopts) {
-    return bundle(
-      ['blue.js', 'green.js', 'red.js'],
-      { basedir: src },
-      dest,
-      fopts
-    )
-  }
-
+test('factor, common', function(t, cb) {
   runSequence([
     clean,
-    pack.bind(null, {
-      needFactor: true,
-    }),
-    cmp,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'single-bundle'), t)
+    },
+  ], cb)
+})
 
-    reset.bind(null, 'common-default-factor-entries'),
+test('factor, string', function(t, cb) {
+  runSequence([
     clean,
-    pack.bind(null, {
-      needFactor: true,
-      common: 'common.js',
-    }),
-    cmp,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        'common.js'
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'single-bundle'), t)
+    },
+  ], cb)
+})
 
-    reset.bind(null, 'array-filter-factor-entries'),
+test('factor, default', function(t, cb) {
+  runSequence([
     clean,
-    pack.bind(null, {
-      entries: ['blue.js', 'green.js'],
-      common: 'common.js',
-    }),
-    cmp,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        null
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'single-bundle'), t)
+    },
+  ], cb)
+})
 
-    reset.bind(null, 'function-filter-factor-entries'),
+test('factor, needFactor', function(t, cb) {
+  runSequence([
     clean,
-    pack.bind(null, {
-      entries: function (bentries) {
-        return bentries.filter(function (p) {
-          var base = path.basename(p)
-          return base === 'blue.js' || base === 'green.js'
-        })
-      },
-      common: 'common.js',
-    }),
-    cmp,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          needFactor: true,
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-without-common'), t)
+    },
+  ], cb)
+})
 
-    reset.bind(null, 'function-outputs'),
+test('factor, default bundles with common', function(t, cb) {
+  runSequence([
     clean,
-    pack.bind(null, {
-      outputs: function (entries) {
-        return entries.map(function (p) {
-          return path.join(
-            path.dirname(p),
-            'xxx-' + path.basename(p)
-          )
-        })
-      },
-      common: 'common.js',
-    }),
-    ncmp.bind(null, function (p) {
-      return p.replace('xxx-', '')
-    }),
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          needFactor: true,
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles'), t)
+    },
+  ], cb)
+})
 
+test('factor, non factor entries go to common', function(t, cb) {
+  runSequence([
+    clean,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js', 'dark-blue.js'],
+        { basedir: src },
+        dest,
+        {
+          entries: ['blue.js', 'green.js', 'red.js'],
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-include-non-factor-entries'), t)
+    },
+  ], cb)
+})
+
+test('factor, non-string entries', function(t, cb) {
+  runSequence([
+    clean,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', { file: './red.js' }],
+        { basedir: src },
+        dest,
+        {
+          needFactor: true,
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-non-string-entries'), t)
+    },
+  ], cb)
+})
+
+test('factor, entries, function', function(t, cb) {
+  runSequence([
+    clean,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js', 'dark-blue.js'],
+        { basedir: src },
+        dest,
+        {
+          entries: function (bentries) {
+            return bentries.filter(function (p) {
+              var base = path.basename(p)
+              return base !== 'dark-blue.js'
+            })
+          },
+          common: 'common.js',
+          threshold: function () {
+            return false
+          },
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-include-non-factor-entries'), t)
+    },
+  ], cb)
+})
+
+test('factor, outputs, array', function(t, cb) {
+  runSequence([
+    clean,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          outputs: ['page/blue.js', 'page/green.js', 'page/red.js'],
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-outputs'), t)
+    },
+  ], cb)
+})
+
+test('factor, outputs, function', function(t, cb) {
+  runSequence([
+    clean,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          outputs: function (entries) {
+            return entries.map(function (file) {
+              return path.join(
+                path.dirname(file), 'page', path.basename(file)
+              )
+            })
+          },
+          common: 'common.js',
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-outputs'), t)
+    },
+  ], cb)
+})
+
+test('factor, outputs, gulp-rename', function(t, cb) {
+  runSequence([
+    clean,
+    function () {
+      return bundle(
+        ['blue.js', 'green.js', 'red.js'],
+        { basedir: src },
+        dest,
+        {
+          needFactor: true,
+          common: 'common.js',
+        },
+        function (p) {
+          if (p.basename === 'common') {
+            return p
+          }
+          p.dirname += '/page'
+          return p
+        }
+      )
+    },
+    function () {
+      compare(dest, fixtures('expected', 'multiple-bundles-outputs'), t)
+    },
   ], cb)
 })
 

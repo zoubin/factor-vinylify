@@ -5,6 +5,7 @@ var path = require('path')
 var del = require('del')
 var gutil = require('gulp-util')
 var uglify = require('gulp-uglify')
+var rename = require('gulp-rename')
 var gulp = require('gulp')
 
 var fixtures = path.resolve.bind(path, __dirname)
@@ -22,9 +23,9 @@ gulp.task('single-bundle', ['clean'], function () {
   }
   return browserify(opts)
     .plugin(vinylify, { common: 'common.js' })
-    .bundle()
     .on('log', log)
     .on('error', log)
+    .bundle()
     .pipe(uglify())
     .pipe(gulp.dest(DEST))
 })
@@ -37,12 +38,11 @@ gulp.task('multi-bundles-with-entry-in-common', ['clean'], function () {
   return browserify(opts)
     .plugin(vinylify, {
       entries: ['green.js', 'red.js'],
-      outputs: ['green.js', 'red.js'],
       common: 'common.js',
     })
-    .bundle()
     .on('log', log)
     .on('error', log)
+    .bundle()
     .pipe(uglify())
     .pipe(gulp.dest(DEST))
 })
@@ -57,9 +57,9 @@ gulp.task('bundle-for-each-browserify-entry', ['clean'], function () {
       needFactor: true,
       common: 'common.js',
     })
-    .bundle()
     .on('log', log)
     .on('error', log)
+    .bundle()
     .pipe(uglify())
     .pipe(gulp.dest(DEST))
 })
@@ -73,9 +73,50 @@ gulp.task('bundle-for-each-browserify-entry-with-no-common', ['clean'], function
     .plugin(vinylify, {
       needFactor: true,
     })
-    .bundle()
     .on('log', log)
     .on('error', log)
+    .bundle()
+    .pipe(uglify())
+    .pipe(gulp.dest(DEST))
+})
+
+gulp.task('outputs', ['clean'], function () {
+  var opts = {
+    entries: ['blue.js', 'green.js', 'red.js'],
+    basedir: fixtures('src'),
+  }
+  return browserify(opts)
+    .plugin(vinylify, {
+      outputs: ['page/blue.js', 'page/green.js', 'page/red.js'],
+      common: 'common.js'
+    })
+    .on('log', log)
+    .on('error', log)
+    .bundle()
+    .pipe(uglify())
+    .pipe(gulp.dest(DEST))
+})
+
+gulp.task('rename', ['clean'], function () {
+  var opts = {
+    entries: ['blue.js', 'green.js', 'red.js'],
+    basedir: fixtures('src'),
+  }
+  return browserify(opts)
+    .plugin(vinylify, {
+      needFactor: true,
+      common: 'common.js'
+    })
+    .on('log', log)
+    .on('error', log)
+    .bundle()
+    .pipe(rename(function (p) {
+      if (p.basename === 'common') {
+        return p
+      }
+      p.dirname += '/page'
+      return p
+    }))
     .pipe(uglify())
     .pipe(gulp.dest(DEST))
 })
