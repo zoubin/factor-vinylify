@@ -1,6 +1,6 @@
 {
   "name": "factor-vinylify",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Provide a `bundle` function to create a vinyl stream flowing browserify outputs",
   "main": "index.js",
   "dependencies": {
