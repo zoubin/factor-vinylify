@@ -1,9 +1,9 @@
-var test = require('tape')
+var test = require('tap').test
 var runSequence = require('callback-sequence').run
 var path = require('path')
 var del = require('del')
 var fixtures = path.resolve.bind(path, __dirname, 'fixtures')
-var compare = require('./util/compare-directory')
+var compare = require('compare-directory')
 var bundle = require('./util/bundle')
 var dest = fixtures('build')
 var src = fixtures('src', 'commonify')
@@ -12,8 +12,8 @@ function clean() {
   return del(dest)
 }
 
-test('commonify, entries never go to common', function(t, cb) {
-  runSequence([
+test('commonify, entries never go to common', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -27,13 +27,13 @@ test('commonify, entries never go to common', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-commonify-entries-not-to-common'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-commonify-entries-not-to-common'))
     },
-  ], cb)
+  ])
 })
 
-test('commonify, non-entries dedupe go to common', function(t, cb) {
-  runSequence([
+test('commonify, non-entries dedupe go to common', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -47,8 +47,8 @@ test('commonify, non-entries dedupe go to common', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-commonify-dedupe-go-to-common'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-commonify-dedupe-go-to-common'))
     },
-  ], cb)
+  ])
 })
 

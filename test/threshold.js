@@ -1,9 +1,9 @@
-var test = require('tape')
+var test = require('tap').test
 var runSequence = require('callback-sequence').run
 var path = require('path')
 var del = require('del')
 var fixtures = path.resolve.bind(path, __dirname, 'fixtures')
-var compare = require('./util/compare-directory')
+var compare = require('compare-directory')
 var bundle = require('./util/bundle')
 var dest = fixtures('build')
 var src = fixtures('src', 'threshold')
@@ -13,8 +13,8 @@ function clean() {
   return del(dest)
 }
 
-test('threshold, number', function(t, cb) {
-  runSequence([
+test('threshold, number', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -29,13 +29,13 @@ test('threshold, number', function(t, cb) {
       )
     },
     function () {
-      compare(dest, expected, t)
+      compare(t, '*.js', dest, expected)
     },
-  ], cb)
+  ])
 })
 
-test('threshold, string', function(t, cb) {
-  runSequence([
+test('threshold, string', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -50,13 +50,13 @@ test('threshold, string', function(t, cb) {
       )
     },
     function () {
-      compare(dest, expected, t)
+      compare(t, '*.js', dest, expected)
     },
-  ], cb)
+  ])
 })
 
-test('threshold, regexp', function(t, cb) {
-  runSequence([
+test('threshold, regexp', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -71,13 +71,13 @@ test('threshold, regexp', function(t, cb) {
       )
     },
     function () {
-      compare(dest, expected, t)
+      compare(t, '*.js', dest, expected)
     },
-  ], cb)
+  ])
 })
 
-test('threshold, array', function(t, cb) {
-  runSequence([
+test('threshold, array', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -92,13 +92,13 @@ test('threshold, array', function(t, cb) {
       )
     },
     function () {
-      compare(dest, expected, t)
+      compare(t, '*.js', dest, expected)
     },
-  ], cb)
+  ])
 })
 
-test('threshold, function', function(t, cb) {
-  runSequence([
+test('threshold, function', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -115,8 +115,8 @@ test('threshold, function', function(t, cb) {
       )
     },
     function () {
-      compare(dest, expected, t)
+      compare(t, '*.js', dest, expected)
     },
-  ], cb)
+  ])
 })
 

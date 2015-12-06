@@ -1,9 +1,9 @@
-var test = require('tape')
+var test = require('tap').test
 var runSequence = require('callback-sequence').run
 var path = require('path')
 var del = require('del')
 var fixtures = path.resolve.bind(path, __dirname, 'fixtures')
-var compare = require('./util/compare-directory')
+var compare = require('compare-directory')
 var bundle = require('./util/bundle')
 var dest = fixtures('build')
 var src = fixtures('src', 'multiple-bundles')
@@ -12,8 +12,8 @@ function clean() {
   return del(dest)
 }
 
-test('factor, common', function(t, cb) {
-  runSequence([
+test('factor, common', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -26,13 +26,13 @@ test('factor, common', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'single-bundle'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'single-bundle'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, string', function(t, cb) {
-  runSequence([
+test('factor, string', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -43,13 +43,13 @@ test('factor, string', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'single-bundle'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'single-bundle'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, default', function(t, cb) {
-  runSequence([
+test('factor, default', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -60,13 +60,13 @@ test('factor, default', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'single-bundle'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'single-bundle'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, needFactor', function(t, cb) {
-  runSequence([
+test('factor, needFactor', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -79,13 +79,13 @@ test('factor, needFactor', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-without-common'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-without-common'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, default bundles with common', function(t, cb) {
-  runSequence([
+test('factor, default bundles with common', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -99,13 +99,13 @@ test('factor, default bundles with common', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, non factor entries go to common', function(t, cb) {
-  runSequence([
+test('factor, non factor entries go to common', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -119,13 +119,13 @@ test('factor, non factor entries go to common', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-include-non-factor-entries'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-include-non-factor-entries'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, non-string entries', function(t, cb) {
-  runSequence([
+test('factor, non-string entries', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -139,13 +139,13 @@ test('factor, non-string entries', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-non-string-entries'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-non-string-entries'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, entries, function', function(t, cb) {
-  runSequence([
+test('factor, entries, function', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -167,13 +167,13 @@ test('factor, entries, function', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-include-non-factor-entries'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-include-non-factor-entries'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, outputs, array', function(t, cb) {
-  runSequence([
+test('factor, outputs, array', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -187,13 +187,13 @@ test('factor, outputs, array', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-outputs'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-outputs'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, outputs, function', function(t, cb) {
-  runSequence([
+test('factor, outputs, function', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -213,13 +213,13 @@ test('factor, outputs, function', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-outputs'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-outputs'))
     },
-  ], cb)
+  ])
 })
 
-test('factor, outputs, gulp-rename', function(t, cb) {
-  runSequence([
+test('factor, outputs, gulp-rename', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -240,8 +240,8 @@ test('factor, outputs, gulp-rename', function(t, cb) {
       )
     },
     function () {
-      compare(dest, fixtures('expected', 'multiple-bundles-outputs'), t)
+      compare(t, '*.js', dest, fixtures('expected', 'multiple-bundles-outputs'))
     },
-  ], cb)
+  ])
 })
 

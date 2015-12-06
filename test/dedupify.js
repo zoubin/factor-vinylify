@@ -1,9 +1,9 @@
-var test = require('tape')
+var test = require('tap').test
 var runSequence = require('callback-sequence').run
 var path = require('path')
 var del = require('del')
 var fixtures = path.resolve.bind(path, __dirname, 'fixtures')
-var compare = require('./util/compare-directory')
+var compare = require('compare-directory')
 var bundle = require('./util/bundle')
 var dest = fixtures('build')
 var src = fixtures('src', 'dedupify')
@@ -14,8 +14,8 @@ function clean() {
   return del(dest)
 }
 
-test('dedupify', function(t, cb) {
-  runSequence([
+test('dedupify', function(t) {
+  return runSequence([
     clean,
     function () {
       return bundle(
@@ -34,8 +34,8 @@ test('dedupify', function(t, cb) {
         fs.readFileSync(path.join(src, 'blue.copy.js'), 'utf8'),
         'should contain the same contents'
       )
-      compare(dest, expected, t)
+      compare(t, '*.js', dest, expected)
     },
-  ], cb)
+  ])
 })
 

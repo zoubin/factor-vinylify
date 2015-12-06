@@ -1,5 +1,5 @@
 var source = require('vinyl-source-stream')
-var mix = require('util-mix')
+var mix = require('mixy')
 
 module.exports = function (b, opts) {
   if (typeof opts === 'string') {
