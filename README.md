@@ -1,8 +1,6 @@
 # factor-vinylify
 Provide a `bundle` function to create a vinyl stream flowing browserify outputs.
 
-[![npm](https://nodei.co/npm/factor-vinylify.png?downloads=true)](https://www.npmjs.org/package/factor-vinylify)
-
 [![version](https://img.shields.io/npm/v/factor-vinylify.svg)](https://www.npmjs.org/package/factor-vinylify)
 [![status](https://travis-ci.org/zoubin/factor-vinylify.svg?branch=master)](https://travis-ci.org/zoubin/factor-vinylify)
 [![coverage](https://img.shields.io/coveralls/zoubin/factor-vinylify.svg)](https://coveralls.io/github/zoubin/factor-vinylify)
