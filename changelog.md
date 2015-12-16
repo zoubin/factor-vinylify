@@ -1,4 +1,14 @@
-<!-- 780e53b 1449391380000 -->
+<!-- 91f4905 1450249975000 -->
+
+## [v3.0.4](https://github.com/zoubin/factor-vinylify/commit/91f4905) (2015-12-16)
+
+* [[`e0750f5`](https://github.com/zoubin/factor-vinylify/commit/e0750f5)] Update callback-sequence
+
+## [v3.0.3](https://github.com/zoubin/factor-vinylify/commit/64c80ce) (2015-12-16)
+
+* [[`fd8d904`](https://github.com/zoubin/factor-vinylify/commit/fd8d904)] Handle empty browserify entries
+
+* [[`d365744`](https://github.com/zoubin/factor-vinylify/commit/d365744)] CHANGELOG
 
 ## [v3.0.2](https://github.com/zoubin/factor-vinylify/commit/780e53b) (2015-12-06)
 
