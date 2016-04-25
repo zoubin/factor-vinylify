@@ -5,12 +5,12 @@
   "main": "index.js",
   "dependencies": {
     "arr-diff": "^2.0.0",
+    "duplexify": "^3.4.3",
     "factor-bundle": "^2.5.0",
     "merge-stream": "^1.0.0",
     "mixy": "^1.0.0",
     "multimatch": "^2.0.0",
     "through2": "^2.0.0",
-    "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   },
   "devDependencies": {
@@ -20,6 +20,7 @@
     "del": "^2.0.2",
     "eslint": "^1.5.1",
     "gulp": "^3.9.0",
+    "gulp-buffer": "0.0.2",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.4.1",
     "gulp-util": "^3.0.6",
